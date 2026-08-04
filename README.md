@@ -1,14 +1,14 @@
-# Go Web App — DevOpsified 🚀
+# Go Web App — DevOpsified
 
-A simple Go web application, taken from `go run main.go` all the way to a **cloud-native, GitOps-driven deployment on AWS EKS**. This repo is a hands-on demonstration of a full DevOps toolchain applied to a real (if small) application: containerization, Kubernetes manifests, Helm packaging, an NGINX Ingress Controller, an EKS cluster, and continuous delivery with ArgoCD.
+A simple Go web application, taken from `go run main.go` all the way to a **cloud-native, GitOps-driven deployment on AWS EKS**. This repo is a hands-on demonstration of a full DevOps toolchain app[...]
 
 > Built as a practical exercise in taking an application from "runs on my machine" to "runs on a Kubernetes cluster, deployed via GitOps."
 
 ---
 
-## 📌 Overview
+## Overview
 
-The application itself is intentionally simple — a Go `net/http` server that renders a course-listing web page from static HTML/CSS. That simplicity is the point: it keeps the focus on the **DevOps pipeline** around the app rather than the app logic itself.
+The application itself is intentionally simple — a Go `net/http` server that renders a course-listing web page from static HTML/CSS. That simplicity is the point: it keeps the focus on the **Dev[...]
 
 Starting from that base, this project layers on:
 
@@ -22,7 +22,7 @@ Starting from that base, this project layers on:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
  Developer
@@ -47,11 +47,11 @@ Starting from that base, this project layers on:
      └── Ingress ──► NGINX Ingress Controller ──► External traffic
 ```
 
-**Flow in short:** a push to `main` triggers CI, which builds, tests, and lints the app, builds a Docker image and pushes it to Docker Hub tagged with the CI run ID, then writes that same tag into the Helm chart and commits it back to the repo. ArgoCD is watching the repo, picks up the new Helm value, and reconciles the EKS cluster to match — so a single `git push` of application code is enough to ship a new version end to end, with **no manual `kubectl` or `helm upgrade` step**.
+**Flow in short:** a push to `main` triggers CI, which builds, tests, and lints the app, builds a Docker image and pushes it to Docker Hub tagged with the CI run ID, then writes that same tag into[...]
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer                        | Tool / Technology                                     |
 |-------------------------------|--------------------------------------------------------|
@@ -69,7 +69,7 @@ Starting from that base, this project layers on:
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```
 go-web-app-devopsified/
@@ -92,18 +92,18 @@ go-web-app-devopsified/
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- **Multi-stage, distroless Docker image** — the build stage compiles the Go binary with the full `golang` image, then the final image copies only the compiled binary and static assets onto a `gcr.io/distroless/base` image, minimizing image size and attack surface.
+- **Multi-stage, distroless Docker image** — the build stage compiles the Go binary with the full `golang` image, then the final image copies only the compiled binary and static assets onto a `g[...]
 - **Kubernetes-native deployment** — the app runs as a `Deployment`, exposed internally through a `Service`, and externally through an `Ingress` resource.
 - **Helm packaging** — the same Kubernetes resources are templated as a Helm chart, making the release configurable and versioned rather than a set of static YAML files.
 - **Ingress-based routing** — an NGINX Ingress Controller handles external access instead of relying on a `NodePort` or a manually provisioned `LoadBalancer` per service.
-- **GitOps delivery with ArgoCD** — rather than deploying with `kubectl apply` by hand, the desired cluster state lives in this Git repository and ArgoCD continuously reconciles the live EKS cluster against it.
+- **GitOps delivery with ArgoCD** — rather than deploying with `kubectl apply` by hand, the desired cluster state lives in this Git repository and ArgoCD continuously reconciles the live EKS cl[...]
 - **Cloud-ready** — designed to run on a real AWS EKS cluster, not just a local cluster like kind/minikube.
 
 ---
 
-## 🔄 CI/CD Pipeline (GitHub Actions)
+## CI/CD Pipeline (GitHub Actions)
 
 The workflow at `.github/workflows/ci.yml` runs on every push to `main` (excluding changes under `helm/**` and `README.md`, to avoid the pipeline re-triggering itself) and is split into four jobs:
 
@@ -112,13 +112,13 @@ The workflow at `.github/workflows/ci.yml` runs on every push to `main` (excludi
 | **build** | Checks out the code, sets up Go, compiles the binary (`go build`), and runs the unit tests (`go test`) |
 | **code-quality** | Runs `golangci-lint` against the codebase to catch style and correctness issues early |
 | **push** | Logs into Docker Hub, builds the image with Docker Buildx using the repo's `Dockerfile`, and pushes it tagged with the GitHub Actions run ID (`go-web-app:${{ github.run_id }}`) |
-| **update-newtag-in-helm-chart** | Checks the repo back out, updates `helm/go-web-app-chart/values.yaml` so the chart's image tag matches the image just pushed, then commits and pushes that change back to `main` |
+| **update-newtag-in-helm-chart** | Checks the repo back out, updates `helm/go-web-app-chart/values.yaml` so the chart's image tag matches the image just pushed, then commits and pushes that chan[...]
 
-That last job is what closes the loop between CI and CD: instead of someone manually editing the Helm chart after a new image is built, the pipeline does it automatically — and because that commit only touches `helm/**`, the `paths-ignore` filter on the trigger stops it from kicking off another CI run. ArgoCD then picks up the updated chart value and rolls the new image out to the cluster on its own.
+That last job is what closes the loop between CI and CD: instead of someone manually editing the Helm chart after a new image is built, the pipeline does it automatically — and because that com[...]
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -160,11 +160,11 @@ helm install go-web-app ./helm/go-web-app-chart
 
 ### 5. Provision the EKS cluster
 
-Cluster provisioning configuration lives under `eks/`. Once your AWS credentials are configured, provision the cluster and point `kubectl` at it before deploying the Ingress Controller and the application.
+Cluster provisioning configuration lives under `eks/`. Once your AWS credentials are configured, provision the cluster and point `kubectl` at it before deploying the Ingress Controller and the applica[...]
 
 ### 6. Set up the Ingress Controller
 
-Manifests/configuration for the NGINX Ingress Controller live under `ingress-controller/`. Apply them to the cluster so the `Ingress` resource defined in `k8s/` (or the Helm chart) has a controller to route through.
+Manifests/configuration for the NGINX Ingress Controller live under `ingress-controller/`. Apply them to the cluster so the `Ingress` resource defined in `k8s/` (or the Helm chart) has a controll[...]
 
 ### 7. Deploy via ArgoCD (GitOps)
 
@@ -172,17 +172,17 @@ Manifests/configuration for the NGINX Ingress Controller live under `ingress-con
 kubectl apply -f gitops/argocd/
 ```
 
-Once the ArgoCD `Application` resource is created, ArgoCD picks up the Helm chart from this repository and keeps the cluster in sync with it automatically — no manual `kubectl apply` needed for future changes.
+Once the ArgoCD `Application` resource is created, ArgoCD picks up the Helm chart from this repository and keeps the cluster in sync with it automatically — no manual `kubectl apply` needed for[...]
 
 ---
 
-## 🖼️ Preview
+## Preview
 
 The application serves a simple course-listing page — see `static/images/golang-website.png` in the repo for a preview of the running app.
 
 ---
 
-## 📚 What This Project Demonstrates
+## What This Project Demonstrates
 
 - Writing a production-style, multi-stage `Dockerfile` with a minimal distroless runtime image
 - Structuring Kubernetes resources both as raw manifests and as a reusable Helm chart
@@ -194,7 +194,7 @@ The application serves a simple course-listing page — see `static/images/golan
 
 ---
 
-## 🗺️ Possible Next Steps
+## Possible Next Steps
 
 - [ ] Add resource requests/limits and health probes (liveness/readiness) to the Deployment
 - [ ] Add TLS termination at the Ingress (cert-manager + Let's Encrypt)
@@ -205,7 +205,7 @@ The application serves a simple course-listing page — see `static/images/golan
 
 ---
 
-## 👤 Author
+## Author
 
 **Alaa Atwa**
 DevOps / System Administration | Cloud & Infrastructure
@@ -213,6 +213,6 @@ GitHub: [@Alaa-Atwa](https://github.com/Alaa-Atwa)
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available for learning purposes.
